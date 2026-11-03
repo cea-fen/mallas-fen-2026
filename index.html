@@ -40,7 +40,14 @@ body{margin:0;background:var(--bg);color:var(--body);font-family:var(--font);fon
 .tab[aria-disabled="true"]{cursor:not-allowed;opacity:.62}
 .tab:focus-visible{outline:2px solid #fff;outline-offset:-4px}
 
-.workspace{padding:16px 24px 24px}
+.workspace{padding:16px 24px 24px;transition:padding .2s}
+@media (min-width:761px){body.panel-open .workspace{padding-right:calc(var(--pw,320px) + 40px)}}
+.rsz{position:absolute;left:-6px;top:0;bottom:0;width:12px;cursor:ew-resize;z-index:2;touch-action:none}
+.rsz::after{content:"";position:absolute;left:4px;top:50%;width:4px;height:44px;transform:translateY(-50%);background:var(--line);transition:background .15s}
+.rsz:hover::after,.rsz:focus-visible::after,body.resizing .rsz::after{background:var(--career)}
+.rsz:focus-visible{outline:2px solid var(--sel);outline-offset:-2px}
+body.resizing{cursor:ew-resize;user-select:none}
+@media (max-width:760px){.rsz{display:none}}
 @media (max-width:960px){.workspace{padding:12px 12px 20px}}
 .fit{position:relative}
 .stage{transform-origin:0 0}
@@ -55,7 +62,40 @@ body{margin:0;background:var(--bg);color:var(--body);font-family:var(--font);fon
 .legend .lbl{margin-right:4px;color:var(--ink);font-weight:600}
 .legend .scale{font-size:12px}
 
-.scroller{overflow-x:auto;background:var(--stage);border:1px solid var(--line);border-radius:0}
+.viewswitch,.mview{display:none}
+@media (max-width:760px){
+  .viewswitch{display:flex;margin:0 0 10px}
+  #zoom{display:none}
+  body.listview .mview{display:block}
+  body.listview #scroller{display:none}
+}
+.lsem{margin:0 0 14px}
+.lsem h3{position:sticky;top:0;z-index:2;margin:0;padding:8px 2px;font-size:14px;color:var(--ink);background:var(--bg);border-bottom:2px solid var(--career)}
+.lsem h3 small{font-weight:400;color:var(--muted);margin-left:6px;font-size:12px}
+.lsem ul{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:7px}
+.lc{width:100%;display:grid;grid-template-columns:8px 1fr auto;align-items:stretch;padding:0;font:inherit;text-align:left;cursor:pointer;
+  background:var(--surface);color:var(--ink);border:1px solid var(--line);transition:opacity .18s}
+.lc .strip{background:var(--f)}
+.lc .lt{padding:9px 10px;font-size:14px;line-height:1.3}
+.lc .lt small{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;font-size:11px;color:var(--muted)}
+.lc .lcr{padding:9px 10px;font-size:13px;font-weight:700;border-left:1px solid var(--line);display:flex;align-items:center}
+.lc:focus-visible{outline:2px solid var(--sel);outline-offset:2px}
+.mview.has-sel .lc:not(.sel):not(.pre):not(.post),.mview.has-filter .lc:not(.hit):not(.slot):not(.pend){opacity:.35}
+.lc.sel{box-shadow:0 0 0 2px #fff,0 0 0 5px var(--focus)}
+.lc.pre.d1{box-shadow:0 0 0 3px var(--pre)} .lc.post.d1{box-shadow:0 0 0 3px var(--post)}
+.lc.pre.d2,.lc.pre.d3{outline:2px dashed var(--pre);outline-offset:2px}
+.lc.post.d2,.lc.post.d3{outline:2px dashed var(--post);outline-offset:2px}
+.lc.hit{box-shadow:0 0 0 3px var(--fen-blue)} .lc.slot{outline:2px dashed var(--fen-blue);outline-offset:2px}
+.lc.pend{box-shadow:0 0 0 3px color-mix(in srgb,var(--fen-blue) 30%,transparent)}
+.scroller .stage{cursor:grab;user-select:none;-webkit-user-select:none}
+.scroller.dragging .stage,.scroller.dragging .box{cursor:grabbing}
+.zoomctl{margin-left:auto;display:inline-flex;align-items:stretch;border:1px solid var(--line);background:var(--surface);font-size:12.5px}
+.zoomctl button{font:inherit;font-weight:600;min-width:32px;padding:5px 9px;border:0;background:transparent;color:var(--ink);cursor:pointer}
+.zoomctl button+span,.zoomctl span+button,.zoomctl .zfit{border-left:1px solid var(--line)}
+.zoomctl #zpct{display:flex;align-items:center;padding:0 8px;min-width:54px;justify-content:center;color:var(--muted);font-variant-numeric:tabular-nums}
+.zoomctl button:disabled{color:#a6a6a6;cursor:default}
+.zoomctl button:focus-visible{outline:2px solid var(--sel);outline-offset:-2px}
+.scroller{max-height:calc(100vh - 24px);overflow:auto;scrollbar-gutter:stable;background:var(--stage);border:1px solid var(--line);border-radius:0}
 .stage{position:relative}
 .stage svg{position:absolute;inset:0;overflow:visible}
 
@@ -69,12 +109,12 @@ body{margin:0;background:var(--bg);color:var(--body);font-family:var(--font);fon
 .box{position:absolute;display:grid;grid-template-columns:1fr 24px;padding:0;margin:0;border:1px solid rgba(20,25,22,.38);border-radius:0;
   background:var(--f);color:#1d2330;font:inherit;text-align:center;cursor:pointer;z-index:1;
   transition:opacity .18s, filter .18s, box-shadow .18s}
-.box .nm{display:flex;align-items:center;justify-content:center;padding:6px 5px 3px;font-size:10.9px;letter-spacing:-.01em;line-height:1.18;font-weight:500}
+.box .nm{display:flex;align-items:center;justify-content:center;padding:6px 5px 3px;font-size:12px;letter-spacing:-.01em;line-height:1.15;font-weight:500}
 .box .cr{color:#1d2330;display:flex;align-items:center;justify-content:center;border-left:1px solid rgba(20,25,22,.38);background:rgba(255,255,255,.75);font-size:11px;font-weight:700}
 .box:focus-visible{outline:2px solid var(--sel);outline-offset:3px}
 .box .badge{position:absolute;top:-9px;left:6px;font-size:9.5px;font-weight:700;line-height:1;padding:3px 6px;border-radius:0;
   background:var(--surface);color:var(--ink);border:1px solid var(--line);white-space:nowrap}
-.box .n3{position:absolute;bottom:2px;left:5px;font-size:9px;opacity:.75}
+.box .n3{position:absolute;bottom:2px;left:5px;font-size:9.5px;font-weight:600}
 
 .stage.has-sel .box{opacity:.28;filter:saturate(.25)}
 .stage.has-sel .box.sel,.stage.has-sel .box.pre,.stage.has-sel .box.post{opacity:1;filter:none}
@@ -90,7 +130,7 @@ body{margin:0;background:var(--bg);color:var(--body);font-family:var(--font);fon
 .box.post.d3{outline:2px dashed color-mix(in srgb, var(--post) 42%, transparent);outline-offset:3px;z-index:2}
 
 /* Líneas */
-.edge{opacity:.42;transition:opacity .18s}
+.edge{opacity:.2;transition:opacity .18s}
 .edge path{fill:none;stroke:var(--edge);stroke-width:1.25}
 .edge circle{fill:var(--edge)}
 .edge.hov{opacity:.95}
@@ -108,7 +148,7 @@ body{margin:0;background:var(--bg);color:var(--body);font-family:var(--font);fon
 .stage.has-sel .edge.d2 path,.stage.has-sel .edge.d3 path{stroke-width:1.6;stroke-dasharray:5 4}
 
 /* Panel lateral */
-.sheet{position:fixed;top:calc(16px + env(safe-area-inset-top,0px));right:16px;max-height:calc(100vh - 32px - env(safe-area-inset-top,0px));width:min(370px,calc(100% - 24px));z-index:20;
+.sheet{position:fixed;top:calc(16px + env(safe-area-inset-top,0px));right:16px;max-height:calc(100vh - 32px - env(safe-area-inset-top,0px));width:min(var(--pw,320px),calc(100% - 24px));z-index:20;
   display:flex;flex-direction:column;background:rgba(255,255,255,.84);-webkit-backdrop-filter:blur(12px) saturate(1.15);backdrop-filter:blur(12px) saturate(1.15);
   border:1px solid rgba(20,25,22,.14);border-radius:0;box-shadow:0 14px 40px rgba(15,20,18,.20);transition:background .2s}
 .sheet:hover,.sheet:focus-within{background:rgba(255,255,255,.97)}
@@ -118,9 +158,12 @@ body{margin:0;background:var(--bg);color:var(--body);font-family:var(--font);fon
 .sheet .hd > div{flex:1;min-width:0}
 .sheet .body{padding:4px 16px 14px;overflow:auto;flex:1}
 .sheet .acts{display:flex;flex-wrap:wrap;gap:8px;padding:12px 16px 14px;border-top:1px solid var(--line)}
-.sheet.min{bottom:auto}
-.sheet.min .body,.sheet.min .acts{display:none}
-.sheet.min .hd{border-bottom:0}
+@media (min-width:761px){.sheet [data-min]{display:none}}
+@media (max-width:760px){
+  .sheet.min{bottom:0}
+  .sheet.min .body,.sheet.min .acts{display:none}
+  .sheet.min .hd{border-bottom:0}
+}
 @media (max-width:760px){
   .sheet,.sheet.left{top:auto;left:8px;right:8px;bottom:0;width:auto;max-height:58vh;border-radius:0;padding-bottom:env(safe-area-inset-bottom,0px)}
 }
@@ -134,12 +177,13 @@ body{margin:0;background:var(--bg);color:var(--body);font-family:var(--font);fon
 .icon:focus-visible,.btn:focus-visible{outline:2px solid var(--sel);outline-offset:2px}
 .btn{text-decoration:none;display:inline-block;font:inherit;font-size:13px;font-weight:600;padding:7px 12px;border-radius:0;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
 .btn.primary{background:var(--career);border-color:var(--career);color:#fff}
-.btn[aria-disabled="true"]{opacity:.5;cursor:not-allowed}
+.btn[aria-disabled="true"],.btn.primary[aria-disabled="true"]{background:#ececec;border-color:#d6d6d6;color:#595959;cursor:not-allowed}
 .ficha{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;margin:0;font-size:13px}
 .ficha dt{color:var(--muted)}
 .ficha dd{margin:0}
 .ficha .tbd{color:var(--muted);font-style:italic}
 .desc{font-size:13px;margin:0;color:var(--ink)}
+.ctx{margin:10px 0 0;padding:8px 10px 8px 26px;background:var(--bg);border-left:3px solid var(--career);font-size:12.5px;color:var(--ink);display:grid;gap:3px}
 .sectabs{display:flex;flex-wrap:wrap;gap:4px;border-bottom:1px solid var(--line);margin:0 0 10px}
 .sectab{font:inherit;font-size:12.5px;font-weight:600;padding:6px 10px;border:1px solid transparent;border-bottom:0;border-radius:0;
   background:transparent;color:var(--muted);cursor:pointer;margin-bottom:-1px;display:inline-flex;align-items:center;gap:6px}
@@ -177,6 +221,35 @@ body{margin:0;background:var(--bg);color:var(--body);font-family:var(--font);fon
 
 @media (prefers-reduced-motion: reduce){.box,.edge{transition:none}.box.sel{animation:none}}
 
+/* Filtros */
+.filters{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:0 0 10px;font-size:13px}
+.filters select{font:inherit;font-size:13px;padding:6px 30px 6px 10px;border:1px solid var(--line);border-radius:0;background:var(--surface);color:var(--ink);min-width:260px;max-width:100%}
+.filters select:focus-visible{outline:2px solid var(--sel);outline-offset:2px}
+.filters .zoom{margin-left:0}
+.box.hit{box-shadow:0 0 0 4px var(--fen-blue);z-index:2}
+.box.slot{outline:2px dashed var(--fen-blue);outline-offset:3px;z-index:2}
+.box.pend{box-shadow:0 0 0 4px color-mix(in srgb, var(--fen-blue) 30%, transparent);z-index:2}
+.stage.has-filter .box:not(.hit):not(.slot):not(.pend){opacity:.25;filter:saturate(.2)}
+.stage.has-filter .edge{opacity:.05}
+.dchip{display:inline-block;font-size:10px;font-weight:800;line-height:1;padding:3px 5px;margin-right:6px;background:var(--fen-blue);color:#fff;vertical-align:1px}
+.box .dtag{position:absolute;bottom:-9px;right:28px;font-size:9.5px;font-weight:800;line-height:1;padding:3px 5px;background:var(--fen-blue);color:#fff;border:1px solid #fff}
+.doms{display:grid;gap:4px;font-size:12px;color:var(--ink);margin:8px 0 4px}
+.route{margin:10px 0 4px;padding:10px 12px 12px;background:color-mix(in srgb,var(--fen-blue) 7%,var(--surface));border-left:3px solid var(--fen-blue)}
+.route h3{margin:0 0 6px}
+.route ol{margin:0;padding-left:18px;font-size:12.5px;line-height:1.45;display:grid;gap:5px;color:var(--ink)}
+.route b{font-weight:600}
+.mlist{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.mlist li{font-size:12.5px;line-height:1.35;padding:6px 8px;background:var(--bg);border-left:3px solid var(--line)}
+.mlist li.ok{border-left-color:var(--fen-blue)}
+.mlist li b{font-weight:600;color:var(--ink)}
+.mlist li small{display:block;color:var(--muted);font-size:11.5px;margin-top:2px}
+.mlist li button.chip{margin-top:4px}
+.keyline{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--muted);margin-top:4px}
+.keyline span{display:inline-flex;align-items:center;gap:6px}
+.k-hit{width:14px;height:14px;border:3px solid var(--fen-blue)}
+.k-slot{width:14px;height:14px;border:2px dashed var(--fen-blue)}
+.k-pend{width:14px;height:14px;border:3px solid color-mix(in srgb, var(--fen-blue) 30%, transparent)}
+.mlist li.pd{border-left-color:color-mix(in srgb, var(--fen-blue) 30%, transparent)}
 /* Interruptor de vía del ciclo profesional */
 .routes{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin:0 0 10px;font-size:13px}
 .routes[hidden]{display:none}
@@ -202,13 +275,23 @@ body{margin:0;background:var(--bg);color:var(--body);font-family:var(--font);fon
 <main class="workspace">
   <section>
     <div class="toolbar">
-      <span>Selecciona un curso para ver su cadena completa.</span>
+      <span>Selecciona un curso para ver su cadena completa. Usa la rueda del mouse para acercar y arrastra para moverte.</span>
       <span class="legend"><span class="sw" style="--c:var(--focus);background:color-mix(in srgb,var(--focus) 30%,transparent)"></span><span class="k" style="color:var(--ink);font-weight:600">Curso seleccionado</span></span>
       <span class="legend"><span class="lbl">Prerrequisitos</span>
         <span class="sw" style="--c:var(--pre)"></span><span class="k">directo</span><span class="sw ind" style="--c:var(--pre)"></span><span class="k">indirecto</span></span>
       <span class="legend"><span class="lbl">Cursos que habilita</span>
         <span class="sw" style="--c:var(--post)"></span><span class="k">directo</span><span class="sw ind" style="--c:var(--post)"></span><span class="k">indirecto</span></span>
-      <button type="button" class="zoom" id="zoom" aria-pressed="false">Ver a tamaño real</button>
+      <span class="zoomctl" id="zoom" role="group" aria-label="Zoom de la malla">
+        <button type="button" id="zout" aria-label="Alejar">&minus;</button>
+        <span id="zpct" aria-live="polite">100 %</span>
+        <button type="button" id="zin" aria-label="Acercar">+</button>
+        <button type="button" id="zfit" class="zfit">Ajustar al ancho</button>
+      </span>
+    </div>
+    <div class="filters">
+      <label for="filt" class="routes-lbl">Destacar cursos</label>
+      <select id="filt"></select>
+      <button type="button" class="zoom" id="filt-clear" hidden>Quitar destacado</button>
     </div>
     <div class="routes" id="routes" hidden>
       <span class="routes-lbl" id="routes-lbl">Ciclo profesional</span>
@@ -218,6 +301,8 @@ body{margin:0;background:var(--bg);color:var(--body);font-family:var(--font);fon
       </div>
       <span class="routes-rule" id="routes-rule"></span>
     </div>
+    <div class="viewswitch" id="viewswitch"><button type="button" class="zoom" id="viewbtn">Ver como grilla</button></div>
+    <div class="mview" id="mview" aria-label="Malla por semestre"></div>
     <div class="scroller" id="scroller">
       <div class="fit" id="fit"><div class="stage" id="stage"></div></div>
     </div>
@@ -490,7 +575,7 @@ const CA = [
 ];
 
 const CAREERS = {
-  icla:{tab:'ICLA',title:'Ingeniería Comercial',sub:'Licenciatura en Ciencias de la Administración de Empresas, malla 2026',
+  icla:{tab:'ICLA',exam:['neg3','mk2','fi2','gp2'],title:'Ingeniería Comercial',sub:'Licenciatura en Ciencias de la Administración de Empresas, malla 2026',
     color:'#0c3a7d',rows:9,courses:ICLA,
     routes:{mag:'Como máximo 3 electivos de pregrado y al menos 7 electivos de magíster.',
             pra:'5 electivos de pregrado o de magíster, más la inscripción de la práctica profesional.'},
@@ -501,7 +586,7 @@ const CAREERS = {
       '(3) Programación para Analítica de Datos y Tecnología y Sistemas de Información se inscriben con la mitad de la cohorte en el primer semestre. Quien no tenga inscrita alguna de las dos el primer semestre la inscribe en el siguiente proceso.',
       'Examen final: requiere aprobar Negocios III, Marketing II, Finanzas II, Gestión de Personas II y todos sus requisitos.',
       'Requisitos según Decreto Universitario N°0010366/2026. Ubicación de los cursos según la malla oficial 2026.']},
-  icle:{tab:'ICLE',title:'Ingeniería Comercial',sub:'Licenciatura en Ciencias Económicas, malla 2026',
+  icle:{tab:'ICLE',exam:['ma4','mi3','mi4','mc2'],title:'Ingeniería Comercial',sub:'Licenciatura en Ciencias Económicas, malla 2026',
     color:'#c8191d',rows:9,courses:ICLE,
     routes:{mag:'Como máximo 3 electivos de pregrado y al menos 7 electivos de magíster.',
             pra:'5 electivos de pregrado o de magíster, más la inscripción de la práctica profesional.'},
@@ -512,14 +597,14 @@ const CAREERS = {
       '(3) Programación para Analítica de Datos y Tecnología y Sistemas de Información se inscriben con la mitad de la cohorte en el primer semestre. Quien no tenga inscrita alguna de las dos el primer semestre la inscribe en el siguiente proceso.',
       'Examen final: requiere aprobar Macroeconomía IV, Microeconomía III, Microeconomía IV, Métodos Cuantitativos II y todos sus requisitos.',
       'Requisitos según Decreto Universitario N°0010366/2026. Ubicación de los cursos según la malla oficial 2026.']},
-  iicg:{tab:'IICG',title:'Ingeniería en Información y Control de Gestión',titleBr:'Ingeniería en Información<br>y Control de Gestión',sub:'Licenciatura en Sistemas de Información y Control de Gestión, malla 2026',
+  iicg:{tab:'IICG',exam:'all8',title:'Ingeniería en Información y Control de Gestión',titleBr:'Ingeniería en Información<br>y Control de Gestión',sub:'Licenciatura en Sistemas de Información y Control de Gestión, malla 2026',
     color:'#5f8410',rows:10,courses:IICG,
     foot:['(1) Grado de licenciado: requiere aprobar todos los cursos de los 8 primeros semestres.',
       '(2) Título profesional: requiere aprobar todos los cursos de la malla (10 semestres) y el examen final.',
       '(3) Programación para Analítica de Datos y Tecnología y Sistemas de Información se inscriben con la mitad de la cohorte en el primer semestre. Quien no tenga inscrita alguna de las dos el primer semestre la inscribe en el siguiente proceso.',
       'Examen final: requiere aprobar todos los cursos de los 8 primeros semestres.',
       'Requisitos según Decreto Universitario N°0010363/2026. Ubicación de los cursos según la malla oficial 2026.']},
-  ca:{tab:'CA',title:'Contador Auditor',sub:'Licenciatura en Contabilidad y Auditoría, malla 2026',
+  ca:{tab:'CA',exam:'all8',title:'Contador Auditor',sub:'Licenciatura en Contabilidad y Auditoría, malla 2026',
     color:'#0786c2',rows:10,courses:CA,
     foot:['(1) Grado de licenciado: requiere aprobar todos los cursos de los 8 primeros semestres.',
       '(2) Título profesional: requiere aprobar todos los cursos de la malla (10 semestres) y el examen final.',
@@ -528,6 +613,34 @@ const CAREERS = {
       '(*) Requisito de la cátedra: tener 180 créditos aprobados. (**) Mínimo de 240 créditos aprobados más el Curso de Integración Profesional.',
       'Requisitos según Decreto Universitario N°0010364/2026. Ubicación de los cursos según la malla oficial 2026.']}
 };
+
+/* Minors: catálogo de cursos de minors FEN (sin cursos exclusivos de mallas 2020) */
+const MINORS=[{"name": "Análisis Financiero e Inversiones", "items": [{"lvl": "pre", "dom": "Análisis Financiero", "code": "ENCON340 / ENCON3005", "name": "Contabilidad Empresarial I", "careers": ["ICLA"], "note": "electivo ICLE", "elec": ["ICLE"]}, {"lvl": "pre", "dom": "Análisis Financiero", "code": "ENCON310 / ENCON3510", "name": "Análisis Contable", "careers": ["IICG", "CA"]}, {"lvl": "post", "dom": "Análisis Financiero", "code": "ENFIN844", "name": "Ética y Valorización de Empresas (CFA Challenge)", "period": "Otoño", "prog": ["MF"]}, {"lvl": "pre", "dom": "Evaluación de Inversiones", "code": "ENFIN460 / ENFIN4505", "name": "Finanzas II", "careers": ["ICLA"], "note": "electivo ICLE, prerrequisito Finanzas I", "elec": ["ICLE"]}, {"lvl": "pre", "dom": "Evaluación de Inversiones", "code": "ENFIN425 / ENFIN4515", "name": "Gestión Financiera Corporativa", "careers": ["IICG", "CA"]}, {"lvl": "post", "dom": "Evaluación de Inversiones", "code": "ENFIN799", "name": "Inversiones", "period": "Primavera", "prog": ["MF"]}, {"lvl": "post", "dom": "Evaluación de Inversiones", "code": "ENFIN818", "name": "Activos Alternativos", "period": "Otoño", "prog": ["MF"]}, {"lvl": "cap", "dom": "", "code": "Sin código", "name": "Capstone Análisis Financiero e Inversiones"}]}, {"name": "Business y Data Analytics", "items": [{"lvl": "pre", "dom": "Modelos Predictivos/Explicativos", "code": "ENGIN4005", "name": "Machine Learning", "careers": ["IICG"]}, {"lvl": "pre", "dom": "Modelos Predictivos/Explicativos", "code": "ENMEC310 / ENMEC305", "name": "Métodos Cuantitativos I", "careers": ["ICLA", "ICLE"]}, {"lvl": "pre", "dom": "Modelos Predictivos/Explicativos", "code": "ENMEC3015", "name": "Métodos Cuantitativos", "careers": ["IICG", "CA"]}, {"lvl": "pre", "dom": "Modelos Predictivos/Explicativos", "code": "ENMEC350 / ENMEC3505", "name": "Métodos Cuantitativos II", "careers": ["ICLE"]}, {"lvl": "pre", "dom": "Modelos Predictivos/Explicativos", "code": "ENGIN420", "name": "Business Intelligence and Database Applications", "careers": ["ICLA"]}, {"lvl": "pre", "dom": "Modelos Predictivos/Explicativos", "code": "ENGIN4150", "name": "Business Intelligence and Analytics", "careers": ["ICLA"]}, {"lvl": "post", "dom": "Modelos Predictivos/Explicativos", "code": "ENGIN616", "name": "Inteligencia de Negocios y Gestión del Conocimiento", "prog": ["MSIIN"]}, {"lvl": "post", "dom": "Modelos Predictivos/Explicativos", "code": "ENGIN619", "name": "Datos Masivos y Minería de Datos", "prog": ["MSIIN"]}, {"lvl": "post", "dom": "Modelos Predictivos/Explicativos", "code": "ENSTA630", "name": "Econometría II", "prog": ["ME"]}, {"lvl": "post", "dom": "Modelos Predictivos/Explicativos", "code": "ENECO757", "name": "Econometría Aplicada II", "prog": ["MAE"]}, {"lvl": "post", "dom": "Modelos Predictivos/Explicativos", "code": "ENFIN761", "name": "Business Intelligence para las Finanzas", "prog": ["MF", "ME", "MAE"]}, {"lvl": "post", "dom": "Modelos Predictivos/Explicativos", "code": "ENMKT681", "name": "Análisis de Datos para Investigación en Marketing", "prog": ["MMKT"]}, {"lvl": "post", "dom": "Modelos Predictivos/Explicativos", "code": "ENECO863", "name": "Métodos Avanzados de Organización Industrial Empírica", "prog": ["MAE"]}, {"lvl": "post", "dom": "Modelos Predictivos/Explicativos", "code": "ENSTA620", "name": "Econometría I", "prog": ["ME"]}, {"lvl": "post", "dom": "Modelos Predictivos/Explicativos", "code": "ENSTA633", "name": "Econometría Aplicada I", "prog": ["ME"]}, {"lvl": "post", "dom": "Modelos Predictivos/Explicativos", "code": "ENFIN783", "name": "R para Finanzas", "prog": ["MF"]}, {"lvl": "post", "dom": "Modelos Predictivos/Explicativos", "code": "ENMKT744", "name": "Insights Avanzados: Análisis Cualitativo y NLP", "prog": ["MMKT"]}, {"lvl": "pre", "dom": "Modelos Prescriptivos/Toma de Decisiones", "code": "ENOPE300 / ENGIN3505", "name": "Investigación Operativa", "careers": ["IICG"], "note": "electivo CA, ICLA, ICLE", "elec": ["ICLA", "ICLE", "CA"]}, {"lvl": "pre", "dom": "Modelos Prescriptivos/Toma de Decisiones", "code": "ENOPE4150", "name": "Gestión Estratégica de Operaciones", "careers": ["ICLA"], "note": "electivo IICG, CA, ICLE", "elec": ["ICLE", "IICG", "CA"]}, {"lvl": "post", "dom": "Modelos Prescriptivos/Toma de Decisiones", "code": "ENSTA653", "name": "Ciencias de las Decisiones", "prog": ["MSIIN"]}, {"lvl": "post", "dom": "Modelos Prescriptivos/Toma de Decisiones", "code": "ENMKT642", "name": "Marketing Metrics - Balanced Scorecard - Cuadro de Mando Integral", "prog": ["MMKT"]}, {"lvl": "cap", "dom": "", "code": "ENGIN746", "name": "Capstone Business & Data Analytics"}]}, {"name": "International Business", "items": [{"lvl": "pre", "dom": "", "code": "ENECO250 / ENMIC2505", "name": "Economía Aplicada (Applied Economics)", "period": "Otoño y Primavera", "careers": ["ICLA", "ICLE", "IICG"]}, {"lvl": "pre", "dom": "", "code": "ENECO451 / ENNEG3005", "name": "Economía para los Negocios (Managerial Economics)", "period": "Primavera", "careers": ["ICLA"]}, {"lvl": "pre", "dom": "", "code": "ENGIN425 / ENGIN4505", "name": "Gestión de Procesos de Negocios (Business Process Management)", "period": "Primavera", "careers": ["IICG", "CA"]}, {"lvl": "pre", "dom": "", "code": "ENNEG306 / ENNEG3060", "name": "Foreign Direct Investment Projects in Developing Countries and Emerging Markets", "period": "Primavera", "careers": ["ICLA"]}, {"lvl": "pre", "dom": "", "code": "ENNEG307", "name": "Global Innovators", "period": "Otoño", "careers": ["ICLA"]}, {"lvl": "pre", "dom": "", "code": "ENNEG310 / ENNEG3510", "name": "Negocios I (International Business)", "period": "Primavera", "careers": ["ICLA"]}, {"lvl": "pre", "dom": "", "code": "ENNEG426 / ENNEG4260", "name": "Strategic Alliances, Mergers and Acquisitions", "period": "Primavera", "careers": ["ICLA"]}, {"lvl": "pre", "dom": "", "code": "ENOPE415 / ENOPE4150", "name": "Gestión Estratégica de Operaciones (Operations Management)", "period": "Otoño", "careers": ["ICLA"]}, {"lvl": "post", "dom": "", "code": "ENECO822", "name": "Crecimiento Económico, Integración Económica y Desarrollo y Adopción de Tecnologías", "period": "Primavera", "prog": ["MAE"]}, {"lvl": "post", "dom": "", "code": "ENMKT671", "name": "International Marketing", "period": "Otoño", "prog": ["MMKT"]}, {"lvl": "post", "dom": "", "code": "Sin código", "name": "Semana Internacional en inglés (3 SCT)", "period": "Otoño y Primavera", "note": "3 SCT"}, {"lvl": "cap", "dom": "", "code": "ENNEG745", "name": "Capstone International Business", "period": "Otoño y Primavera"}]}, {"name": "Macrofinanzas y Banca", "items": [{"lvl": "pre", "dom": "Macroeconomía", "code": "ENMAC305 / ENMAC3005", "name": "Macroeconomía I", "careers": ["ICLE"], "note": "electivo ESIA; ICLA", "elec": ["ICLA", "IICG", "CA"]}, {"lvl": "pre", "dom": "Macroeconomía", "code": "ENMAC3505", "name": "Macroeconomía II", "careers": ["ICLE"], "note": "electivo ESIA; ICLA, prerrequisito Macroeconomía I", "elec": ["ICLA", "IICG", "CA"]}, {"lvl": "post", "dom": "Macroeconomía", "code": "ENSTA630", "name": "Econometría II", "prog": ["ME"]}, {"lvl": "post", "dom": "Macroeconomía", "code": "ENECO670", "name": "Macroeconomía II", "prog": ["ME"]}, {"lvl": "post", "dom": "Macroeconomía", "code": "ENECO757", "name": "Econometría Aplicada II", "prog": ["MAE"]}, {"lvl": "post", "dom": "Macroeconomía", "code": "ENECO822", "name": "Crecimiento Económico, Integración Económica y Desarrollo y Adopción de Tecnologías", "prog": ["MAE"]}, {"lvl": "post", "dom": "Macroeconomía", "code": "ENFIN797", "name": "Tópicos de Finanzas Internacionales", "prog": ["ME"]}, {"lvl": "post", "dom": "Macroeconomía", "code": "ENECO793", "name": "Tópicos en Macroeconomía", "prog": ["ME"]}, {"lvl": "post", "dom": "Macroeconomía", "code": "ENECO821", "name": "Macroeconomía Abierta a Economías Emergentes", "prog": ["MAE"]}, {"lvl": "post", "dom": "Macroeconomía", "code": "ENECO630", "name": "Macroeconomía I", "prog": ["ME"]}, {"lvl": "post", "dom": "Macroeconomía", "code": "ENECO887", "name": "Política Monetaria y Mercados Financieros", "prog": ["MAE"]}, {"lvl": "pre", "dom": "Finanzas y Banca", "code": "ENFIN415 / ENFIN3505", "name": "Finanzas I", "careers": ["ICLA"]}, {"lvl": "pre", "dom": "Finanzas y Banca", "code": "ENFIN460 / ENFIN4505", "name": "Finanzas II", "careers": ["ICLA"]}, {"lvl": "pre", "dom": "Finanzas y Banca", "code": "ENFIN355", "name": "Análisis y Planificación Financiera", "careers": ["IICG", "CA"]}, {"lvl": "pre", "dom": "Finanzas y Banca", "code": "ENFIN4005", "name": "Análisis Financiero e Inversiones", "careers": ["IICG", "CA"]}, {"lvl": "pre", "dom": "Finanzas y Banca", "code": "ENFIN425 / ENFIN4515", "name": "Gestión Financiera Corporativa", "careers": ["IICG", "CA"]}, {"lvl": "post", "dom": "Finanzas y Banca", "code": "ENFIN650", "name": "Activos Derivados", "prog": ["MF"]}, {"lvl": "post", "dom": "Finanzas y Banca", "code": "ENFIN680", "name": "Mercado de Capitales", "prog": ["MF"]}, {"lvl": "post", "dom": "Finanzas y Banca", "code": "ENFIN600", "name": "Banca e Intermediación Financiera", "prog": ["MF"]}, {"lvl": "post", "dom": "Finanzas y Banca", "code": "ENFIN761", "name": "Business Intelligence para las Finanzas", "prog": ["MF", "ME", "MAE"]}, {"lvl": "post", "dom": "Finanzas y Banca", "code": "ENFIN790", "name": "Instrumentos de Renta Fija", "prog": ["MF"]}, {"lvl": "post", "dom": "Finanzas y Banca", "code": "ENFIN799", "name": "Inversiones", "prog": ["MF"]}, {"lvl": "post", "dom": "Finanzas y Banca", "code": "ENFIN608", "name": "Finanzas Corporativas", "prog": ["MF"]}, {"lvl": "post", "dom": "Finanzas y Banca", "code": "ENFIN711", "name": "Control y Análisis Financiero", "prog": ["MF"]}, {"lvl": "post", "dom": "Finanzas y Banca", "code": "ENFIN828", "name": "Trading y Microestructura de Mercado", "prog": ["MF"]}, {"lvl": "post", "dom": "Finanzas y Banca", "code": "ENFIN636", "name": "Finanzas Internacionales", "prog": ["MF"]}, {"lvl": "post", "dom": "Finanzas y Banca", "code": "ENFIN820", "name": "Teoría de Finanzas", "prog": ["MF"]}, {"lvl": "post", "dom": "Finanzas y Banca", "code": "ENFIN818", "name": "Activos Alternativos", "prog": ["MF"]}, {"lvl": "post", "dom": "Finanzas y Banca", "code": "ENFIN619", "name": "Riesgo Financiero", "prog": ["MF"]}, {"lvl": "post", "dom": "Finanzas y Banca", "code": "ENSTA607", "name": "Econometría Financiera", "prog": ["MF"]}, {"lvl": "post", "dom": "Finanzas y Banca", "code": "ENFIN783", "name": "R para Finanzas", "prog": ["MF"]}, {"lvl": "post", "dom": "Finanzas y Banca", "code": "ENDER605", "name": "Derecho para Economía y Negocios", "prog": ["MF", "MCG", "MAE", "MSIIN", "MPP"]}, {"lvl": "cap", "dom": "", "code": "ENMAC745", "name": "Capstone Macrofinanzas y Banca"}]}, {"name": "Transformación Digital", "items": [{"lvl": "pre", "dom": "Sistemas y Tecnologías de la Información", "code": "ENGIN305 / ENGIN3005", "name": "Sistemas de ADM de BBDD", "careers": ["IICG"]}, {"lvl": "pre", "dom": "Sistemas y Tecnologías de la Información", "code": "ENGIN3510", "name": "Sistemas de Aplicaciones", "careers": ["IICG", "CA"]}, {"lvl": "pre", "dom": "Sistemas y Tecnologías de la Información", "code": "ENGIN420", "name": "Business Intelligence and Database Applications", "careers": ["ICLA"]}, {"lvl": "pre", "dom": "Sistemas y Tecnologías de la Información", "code": "ENGIN415", "name": "Business Intelligence and Analytics", "careers": ["ICLA"]}, {"lvl": "post", "dom": "Sistemas y Tecnologías de la Información", "code": "ENGIN615", "name": "Arquitectura Integral de Sistemas", "prog": ["MSIIN"]}, {"lvl": "post", "dom": "Sistemas y Tecnologías de la Información", "code": "ENGIN617", "name": "Gestión de Portafolios de Proyectos de Sistemas y Tecnologías de la Información", "prog": ["MSIIN"]}, {"lvl": "pre", "dom": "Gestión del Cambio y Nuevos Negocios Digitales", "code": "ENMKT438", "name": "Marketing Digital Estratégico", "careers": ["ICLA"]}, {"lvl": "pre", "dom": "Gestión del Cambio y Nuevos Negocios Digitales", "code": "ENGEP355", "name": "Gestión de Personas II", "careers": ["ICLA"]}, {"lvl": "pre", "dom": "Gestión del Cambio y Nuevos Negocios Digitales", "code": "ENGIN4010", "name": "Transformación Digital", "careers": ["IICG"]}, {"lvl": "pre", "dom": "Gestión del Cambio y Nuevos Negocios Digitales", "code": "ENGIN425 / ENGIN4505", "name": "Gestión de Procesos de Negocios", "careers": ["IICG", "CA"]}, {"lvl": "post", "dom": "Gestión del Cambio y Nuevos Negocios Digitales", "code": "ENMAN652", "name": "Comportamiento Organizacional", "prog": ["MGPDO"]}, {"lvl": "post", "dom": "Gestión del Cambio y Nuevos Negocios Digitales", "code": "ENMKT709", "name": "Marketing Digital Avanzado", "prog": ["MMKT"]}, {"lvl": "post", "dom": "Gestión del Cambio y Nuevos Negocios Digitales", "code": "ENFIN637", "name": "Fintech", "prog": ["MF"]}, {"lvl": "post", "dom": "Gestión del Cambio y Nuevos Negocios Digitales", "code": "ENCGE606", "name": "Planificación Estratégica y Gestión de Procesos", "prog": ["MCG"]}, {"lvl": "post", "dom": "Gestión del Cambio y Nuevos Negocios Digitales", "code": "ENNEG724", "name": "Modelos de Negocio y Planificación Estratégica", "prog": ["MSIIN"]}, {"lvl": "post", "dom": "Gestión del Cambio y Nuevos Negocios Digitales", "code": "ENGIN620", "name": "Gestión de Procesos de Operaciones", "prog": ["MSIIN"]}, {"lvl": "cap", "dom": "", "code": "ENGIN745", "name": "Capstone Transformación Digital"}]}];
+/* Cursos en revisión para minors */
+MINORS.forEach(m=>m.items.forEach(it=>{
+  if(it.name==='Métodos Cuantitativos I') it.pend={ICLA:'Este curso será modificado en ICLA y aún no se define si se mantiene en el minor.'};
+  if(it.name==='Métodos Cuantitativos') it.pend={IICG:'En revisión si corresponde al mismo curso que Métodos Cuantitativos I de ICLE.',CA:'En revisión si corresponde al mismo curso que Métodos Cuantitativos I de ICLE.'};
+}));
+const GEN=['Trabajar en equipos diversos, considerando distintos roles de liderazgo al interior de las organizaciones y la comunidad.',
+ 'Aplicar criterios de discernimiento ético para enfrentar dilemas propios de la economía y/o los negocios.',
+ 'Comunicar efectivamente en al menos dos idiomas (español e inglés) para generar impacto en su entorno social.',
+ 'Participar activamente en acciones de responsabilidad social y ciudadanía activa.',
+ 'Aplicar criterios de rigurosidad profesional y disciplinario durante el proceso formativo.',
+ 'Capacidad de pensamiento crítico y autocrítico.',
+ 'Capacidad para integrar conocimientos, enfoques y herramientas de distintas disciplinas en la resolución de problemas complejos.'];
+const GEN_SHORT=['Trabajo en equipos diversos','Discernimiento ético','Comunicación en dos idiomas','Responsabilidad social y ciudadanía','Rigurosidad profesional','Pensamiento crítico y autocrítico','Integración interdisciplinaria'];
+const PROG={MSIIN:'Magíster en Sistemas de Información e Inteligencia de Negocios',MF:'Magíster en Finanzas',MGPDO:'Magíster en Gestión de Personas y Dinámica Organizacional',
+ MMKT:'Magíster en Marketing',MCG:'Magíster en Control de Gestión',ME:'Magíster en Economía',MAE:'Magíster en Análisis Económico',MPP:'Magíster en Políticas Públicas'};
+const norm=t=>t.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\(.*?\)/g,'').toLowerCase().replace(/\s+/g,' ').trim();
+const ALIAS={'sistemas de adm de bbdd':'sistema de administracion de bases de datos'};
+function inMalla(ck,item){
+  const key=ALIAS[norm(item.name)]||norm(item.name);
+  return (CAREERS[ck.toLowerCase()].courses||[]).some(x=>!x.rt&&norm(x.n)===key);
+}
+function courseFor(item){
+  const key=ALIAS[norm(item.name)]||norm(item.name);
+  const c=list.find(x=>!x.rt&&norm(x.n)===key); return c&&c.id;
+}
 
 /* Geometría */
 const W=136,H=64,G=26,RG=17,PL=44,PT=66,COLS=10;
@@ -538,22 +651,86 @@ const NS='http://www.w3.org/2000/svg';
 
 const stage=document.getElementById('stage'), panel=document.getElementById('panel');
 const tabsEl=document.getElementById('tabs'), routesEl=document.getElementById('routes');
+let filt='';
 let cur='icla', route='mag', sel=null;
-let dims={w:0,h:0}, real=false;
-const scroller=document.getElementById('scroller'), fitEl=document.getElementById('fit'), zoomBtn=document.getElementById('zoom');
-const MIN_SCALE=.62;
+let dims={w:0,h:0}, zoomK=null;
+const scroller=document.getElementById('scroller'), fitEl=document.getElementById('fit');
+const zIn=document.getElementById('zin'), zOut=document.getElementById('zout'), zFit=document.getElementById('zfit'), zPct=document.getElementById('zpct');
+const MIN_SCALE=innerWidth<=760?.62:.78, ZMIN=.45, ZMAX=2.2;
+const baseScale=()=>Math.max(MIN_SCALE,Math.min(1,(scroller.clientWidth-2)/dims.w));
+let curK=1;
 function fit(){
   if(!dims.w) return;
-  const avail=scroller.clientWidth-2;
-  const k=real?1:Math.max(MIN_SCALE,Math.min(1,avail/dims.w));
+  const k=zoomK??baseScale();
+  curK=k;
   stage.style.transform=k===1?'':`scale(${k})`;
   fitEl.style.width=(dims.w*k)+'px'; fitEl.style.height=(dims.h*k)+'px';
+  stage.dataset.k=k;
+  zPct.textContent=Math.round(k*100)+' %';
+  zIn.disabled=k>=ZMAX-.001; zOut.disabled=k<=ZMIN+.001; zFit.disabled=zoomK===null;
 }
-new ResizeObserver(fit).observe(scroller);
-zoomBtn.addEventListener('click',()=>{
-  real=!real; zoomBtn.setAttribute('aria-pressed',String(real));
-  zoomBtn.textContent=real?'Ajustar al ancho':'Ver a tamaño real'; fit();
+/* Zoom alrededor de un punto del cuadro (coordenadas relativas al cuadro) */
+function zoomTo(k,mx,my){
+  k=Math.min(ZMAX,Math.max(ZMIN,k));
+  const old=curK;
+  if(mx===undefined){mx=scroller.clientWidth/2; my=Math.min(scroller.clientHeight,innerHeight)/2;}
+  const cx=(scroller.scrollLeft+mx)/old, cy=(scroller.scrollTop+my)/old;
+  zoomK=k; fit();
+  scroller.scrollLeft=cx*k-mx; scroller.scrollTop=cy*k-my;
+}
+scroller.addEventListener('wheel',e=>{
+  if(document.body.classList.contains('listview')) return;
+  /* Desplazamiento horizontal de trackpad: mover, no hacer zoom */
+  if(Math.abs(e.deltaX)>Math.abs(e.deltaY)&&!e.ctrlKey){ scroller.scrollLeft+=e.deltaX; e.preventDefault(); return; }
+  e.preventDefault();
+  const r=scroller.getBoundingClientRect();
+  const step=Math.exp(-e.deltaY*(e.ctrlKey?0.01:0.0015));
+  zoomTo(curK*step,e.clientX-r.left,e.clientY-r.top);
+},{passive:false});
+zIn.addEventListener('click',()=>zoomTo(curK*1.2));
+zOut.addEventListener('click',()=>zoomTo(curK/1.2));
+zFit.addEventListener('click',()=>{zoomK=null; fit(); scroller.scrollTo({left:0,top:0});});
+
+/* Arrastre con la mano en ambos sentidos */
+let drag=null, dragMoved=false;
+scroller.addEventListener('pointerdown',e=>{
+  if(e.pointerType!=='mouse'||e.button!==0) return;
+  drag={x:e.clientX,y:e.clientY,sl:scroller.scrollLeft,st:scroller.scrollTop,wy:scrollY}; dragMoved=false;
 });
+addEventListener('pointermove',e=>{
+  if(!drag) return;
+  const dx=e.clientX-drag.x, dy=e.clientY-drag.y;
+  if(!dragMoved&&Math.hypot(dx,dy)>5){dragMoved=true; scroller.classList.add('dragging');}
+  if(!dragMoved) return;
+  e.preventDefault();
+  scroller.scrollLeft=drag.sl-dx;
+  const maxTop=scroller.scrollHeight-scroller.clientHeight;
+  if(maxTop>0){
+    const want=drag.st-dy; scroller.scrollTop=want;
+    /* Lo que el cuadro no alcanza a desplazar, lo desplaza la página */
+    const extra=want<0?want:want>maxTop?want-maxTop:0;
+    scrollTo(scrollX,drag.wy+extra);
+  } else scrollTo(scrollX,drag.wy-dy);
+});
+addEventListener('pointerup',()=>{
+  if(!drag) return;
+  drag=null; scroller.classList.remove('dragging');
+  if(dragMoved) setTimeout(()=>{dragMoved=false;},0);
+});
+scroller.addEventListener('click',e=>{ if(dragMoved){e.stopPropagation(); e.preventDefault(); dragMoved=false;} },true);
+/* Lleva el curso seleccionado a la zona visible del cuadro */
+function revealSel(){
+  if(!sel||!boxEl[sel]) return;
+  const k=curK, c=byId[sel];
+  const cx=(X(c.s)+WD(c)/2)*k, cy=(Y(c.r)+H/2)*k;
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  scroller.scrollTo({left:Math.max(0,cx-scroller.clientWidth/2),top:Math.max(0,cy-scroller.clientHeight/2),behavior:reduce?'auto':'smooth'});
+}
+new MutationObserver(()=>{document.body.classList.toggle('panel-open',!panel.hidden);}).observe(panel,{attributes:true,attributeFilter:['hidden']});
+/* Reescala solo si cambia el ancho, en el cuadro siguiente, para no encadenar notificaciones */
+let lastW=0;
+new ResizeObserver(()=>{ const w=scroller.clientWidth; if(w===lastW) return; lastW=w; requestAnimationFrame(fit); }).observe(scroller);
+
 let byId={}, kids={}, edges=[], boxEl={}, gEdges=null, list=[];
 
 /* Pestañas */
@@ -566,6 +743,73 @@ Object.entries(CAREERS).forEach(([key,cfg])=>{
 routesEl.querySelectorAll('[data-route]').forEach(b=>b.addEventListener('click',()=>{
   if(b.dataset.route!==route){route=b.dataset.route; build();}
 }));
+
+const filtEl=document.getElementById('filt'), filtClr=document.getElementById('filt-clear');
+function fillFilters(){ filtEl.innerHTML='<option value="">Ninguno</option>'+
+  '<optgroup label="Minor">'+MINORS.map((m,i)=>`<option value="minor:${i}">Minor en ${m.name}</option>`).join('')+'</optgroup>'+
+  '<optgroup label="Competencias genéricas">'+GEN_SHORT.map((g,i)=>`<option value="comp:${i}">${i+1}. ${g}</option>`).join('')+'</optgroup>'+
+  '<optgroup label="Características">'+Object.entries(TAGS).filter(([k])=>k!=='MINOR').map(([k,v])=>`<option value="tag:${k}">${v.t}</option>`).join('')+'</optgroup>'; }
+filtEl.addEventListener('change',()=>{filt=filtEl.value; if(sel) select(null); applyFilter();});
+filtClr.addEventListener('click',()=>{filt=''; filtEl.value=''; applyFilter(); filtEl.focus();});
+
+function applyFilter(){
+  filtClr.hidden=!filt;
+  stage.classList.toggle('has-filter',!!filt);
+  list.forEach(c=>boxEl[c.id].classList.remove('hit','slot','pend'));
+  stage.querySelectorAll('.dtag').forEach(e=>e.remove());
+  if(!filt){ if(!sel) renderEmpty(); syncList(); return; }
+  const [type,v]=filt.split(':');
+  const CK=cur.toUpperCase();
+  if(type==='minor'){
+    const m=MINORS[+v], pend=[], own=[], inCareer=[], other=[], post=[], cap=[];
+    m.items.forEach(it=>{
+      if(it.lvl==='pre'){
+        const id=it.careers.includes(CK)?courseFor(it):null;
+        if(id&&it.pend&&it.pend[CK]){ pend.push([it,id]); boxEl[id].classList.add('pend'); }
+        else if(id){ own.push([it,id]); boxEl[id].classList.add('hit'); }
+        else if(it.careers.includes(CK)) inCareer.push(it);
+        else other.push(it);
+      } else if(it.lvl==='post') post.push(it); else cap.push(it);
+    });
+    list.filter(c=>c.k==='ele'||c.k==='em'||c.k==='epr').forEach(c=>boxEl[c.id].classList.add('slot'));
+    const doms=[...new Set(m.items.map(i=>i.dom).filter(Boolean))];
+    [...own,...pend].forEach(([it,id])=>{ if(it.dom){ const t=document.createElement('span'); t.className='dtag'; t.textContent='D'+(doms.indexOf(it.dom)+1); t.title=it.dom; boxEl[id].appendChild(t);} });
+    renderMinor(m,own,inCareer,other,post,cap,pend);
+  } else {
+    const hits=list.filter(c=> type==='tag' ? secTags(c).includes(v) : ((c.d||{}).compG||[]).includes(+v+1));
+    hits.forEach(c=>boxEl[c.id].classList.add('hit'));
+    renderCat(type,v,hits);
+  }
+  syncList();
+}
+
+const mview=document.getElementById('mview'), viewbtn=document.getElementById('viewbtn');
+let liEl={}, gridMode=false;
+function setView(){
+  document.body.classList.toggle('listview',innerWidth<=760&&!gridMode);
+  viewbtn.textContent=gridMode?'Ver como lista':'Ver como grilla';
+  fit();
+}
+viewbtn.addEventListener('click',()=>{gridMode=!gridMode; setView();});
+addEventListener('resize',setView);
+function buildList(){
+  liEl={}; let html='';
+  for(let sm=1;sm<=10;sm++){
+    const cs=list.filter(c=>(c.span&&sm===1)||(!c.span&&c.s===sm)).sort((a,b)=>a.r-b.r);
+    if(!cs.length) continue;
+    html+=`<section class="lsem"><h3>Semestre ${sm}<small>${ciclo(sm)}</small></h3><ul>${cs.map(c=>{
+      const extra=[c.span?'Semestre 1 o 2':'',c.cr?c.cr+' SCT aprobados':'',...secTags(c)].filter(Boolean).join(', ');
+      return `<li><button type="button" class="lc" data-id="${c.id}" style="--f:${FILL[c.k]}"><span class="strip"></span><span class="lt">${c.n}${extra?`<small>${extra}</small>`:''}</span><span class="lcr">${c.c}</span></button></li>`;}).join('')}</ul></section>`;
+  }
+  mview.innerHTML=html;
+  mview.querySelectorAll('.lc').forEach(b=>{liEl[b.dataset.id]=b;});
+}
+mview.addEventListener('click',e=>{const b=e.target.closest('.lc'); if(b) select(sel===b.dataset.id?null:b.dataset.id);});
+function syncList(){
+  mview.classList.toggle('has-sel',stage.classList.contains('has-sel'));
+  mview.classList.toggle('has-filter',stage.classList.contains('has-filter'));
+  list.forEach(c=>{ if(liEl[c.id]) liEl[c.id].className=boxEl[c.id].className.replace(/\bbox\b/,'lc'); });
+}
 
 function build(){
   const cfg=CAREERS[cur];
@@ -590,7 +834,7 @@ function build(){
   const ROWS=cfg.rows;
   const stageW=PL+COLS*W+(COLS-1)*G+24, stageH=PT+ROWS*H+(ROWS-1)*RG+18;
   stage.innerHTML=''; stage.classList.remove('has-sel'); sel=null; boxEl={};
-  stage.style.width=stageW+'px'; stage.style.height=stageH+'px'; dims={w:stageW,h:stageH}; fit();
+  stage.style.width=stageW+'px'; stage.style.height=stageH+'px'; dims={w:stageW,h:stageH}; zoomK=null; fit();
   const svg=document.createElementNS(NS,'svg'); svg.setAttribute('width',stageW); svg.setAttribute('height',stageH); svg.setAttribute('aria-hidden','true');
   stage.appendChild(svg);
 
@@ -628,7 +872,9 @@ function build(){
     b.addEventListener('mouseleave',()=>hover(c.id,false));
     stage.appendChild(b); boxEl[c.id]=b;
   });
+  buildList();
   renderEmpty();
+  applyFilter();
 }
 
 function pathFor(a,b){
@@ -652,11 +898,12 @@ function walk(start,next){
 const lvl=d=>'d'+Math.min(d,3);
 
 function select(id){
+  if(id&&filt){filt=''; filtEl.value=''; filtClr.hidden=true; stage.classList.remove('has-filter'); stage.querySelectorAll('.dtag').forEach(e=>e.remove());}
   sel=id;
   list.forEach(c=>boxEl[c.id].className='box');
   edges.forEach(e=>e.el.setAttribute('class','edge'));
   stage.classList.toggle('has-sel',!!id);
-  if(!id){renderEmpty();return;}
+  if(!id){renderEmpty();syncList();return;}
   const anc=walk(id,x=>(byId[x].q||[]).filter(p=>byId[p])), des=walk(id,x=>kids[x]);
   boxEl[id].classList.add('sel');
   Object.entries(anc).forEach(([k,d])=>boxEl[k].classList.add('pre',lvl(d)));
@@ -668,6 +915,8 @@ function select(id){
   });
   top.forEach(el=>gEdges.appendChild(el));
   renderPanel(byId[id],anc,des);
+  syncList();
+  if(document.body.classList.contains('listview')){ const r=liEl[id].getBoundingClientRect(); scrollTo({top:r.top+scrollY-110,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}); }
 }
 
 const ciclo=s=>s<=4?'Ciclo Básico':s<=8?'Ciclo Disciplinar':'Ciclo Profesional';
@@ -681,6 +930,32 @@ const tagHTML=(t,cls='tag')=>`<span class="${cls}" title="${(TAGS[t]||{}).t||t}"
 const secTags=c=>{const d=c.d||{};return [...new Set([...(d.tags||[]),...((d.sections||[]).flatMap(x=>x.tags||[]))])];};
 const secLabel=n=>n.length===1?'Sección '+n[0]:'Secciones '+n.slice(0,-1).join(', ')+' y '+n[n.length-1];
 let secIdx=0, panelFor=null;
+const INTERNO=/interno/.test(location.hash+location.search);
+/* Ancho del panel ajustable arrastrando su borde izquierdo (o con flechas del teclado) */
+const PW_MIN=260, PW_MAX=()=>Math.min(560,Math.round(innerWidth*.45));
+let pw=320;
+try{ const v=+localStorage.getItem('mallaPanelW'); if(v) pw=v; }catch(e){}
+function setPW(v){
+  pw=Math.round(Math.min(PW_MAX(),Math.max(PW_MIN,v)));
+  document.documentElement.style.setProperty('--pw',pw+'px');
+  const h=panel.querySelector('.rsz'); if(h) h.setAttribute('aria-valuenow',pw);
+  try{ localStorage.setItem('mallaPanelW',pw); }catch(e){}
+}
+const RSZ=`<div class="rsz" role="separator" aria-orientation="vertical" aria-label="Ancho del panel" aria-valuemin="260" aria-valuemax="560" aria-valuenow="${pw}" tabindex="0" title="Arrastra para cambiar el ancho del panel"></div>`;
+setPW(pw);
+let rszStart=null;
+panel.addEventListener('pointerdown',e=>{
+  if(!e.target.closest('.rsz')) return;
+  e.preventDefault(); rszStart={x:e.clientX,w:pw}; document.body.classList.add('resizing');
+});
+addEventListener('pointermove',e=>{ if(rszStart) setPW(rszStart.w+(rszStart.x-e.clientX)); });
+addEventListener('pointerup',()=>{ if(rszStart){ rszStart=null; document.body.classList.remove('resizing'); } });
+panel.addEventListener('keydown',e=>{
+  if(!e.target.closest('.rsz')) return;
+  if(e.key==='ArrowLeft'){ setPW(pw+20); e.preventDefault(); }
+  if(e.key==='ArrowRight'){ setPW(pw-20); e.preventDefault(); }
+});
+addEventListener('resize',()=>setPW(pw));
 const ELEC_KEYS=new Set(['ele','em','epr','ees','lib']);
 const isElec=c=>ELEC_KEYS.has(c.k)||/^(Electivo|Libre)/.test(c.n);
 function elecHow(c){
@@ -695,8 +970,102 @@ const tbd='<span class="tbd">Por completar</span>';
 const val=(v)=>v&&(!Array.isArray(v)||v.length)?(Array.isArray(v)?v.join(', '):v):tbd;
 let minimized=false;
 
+const domGroup=(arr,fn)=>{const g={};arr.forEach(it=>{(g[it.dom||'']=g[it.dom||'']||[]).push(it)});
+  return Object.entries(g).map(([d,items])=>(d?`<p class="none" style="margin:8px 0 4px;font-weight:600;color:var(--ink)">${d}</p>`:'')+`<ul class="mlist">${items.map(fn).join('')}</ul>`).join('');};
+const codeTxt=it=>it.code&&it.code!=='Sin código'?it.code:'Sin código';
+function filterHead(kind,title,meta){
+  return `<div class="hd"><div><span class="kind">${kind}</span><h2 id="ph">${title}</h2><p class="meta">${meta}</p></div>
+    <button type="button" class="icon" data-min aria-label="${minimized?'Expandir':'Minimizar'} panel" aria-expanded="${!minimized}">${minimized?'+':'&minus;'}</button>
+    <button type="button" class="icon" data-fclear aria-label="Quitar destacado">&times;</button></div>`;
+}
+function showPanel(html,left){ panel.innerHTML=RSZ+html; panel.setAttribute('aria-labelledby','ph'); panel.classList.toggle('min',minimized); panel.classList.remove('left'); panel.hidden=false; }
+
+const MRULE={'Transformación Digital':'Este minor exige al menos 3 cursos de postgrado.',
+  'International Business':'Este minor tiene una estructura distinta por su amplitud, con estándares específicos.'};
+const NAMEFIX={'Sistemas de ADM de BBDD':'Sistema de Administración de Bases de Datos'};
+const shortName=t=>NAMEFIX[t]||t.replace(/ \(.*\)/,'');
+const listNames=(arr,max=4)=>arr.length<=max?arr.join(', '):arr.slice(0,max).join(', ')+` y ${arr.length-max} más (ver listado)`;
+function routeHTML(m,own,inCareer,other,post,cap,doms){
+  const D=d=>'D'+(doms.indexOf(d)+1);
+  const steps=[], notes=[];
+  const capTxt=cap.length?` Uno de ellos puede ser el ${cap[0].name}, por confirmar con la norma del minor.`:'';
+  const preOpts=d=>[...other,...inCareer].filter(i=>i.dom===d&&!i.pend).map(i=>shortName(i.name));
+  if(doms.length>=2){
+    const cnt=d=>own.filter(([it])=>it.dom===d).length;
+    const A=own.length?doms.slice().sort((x,y)=>cnt(y)-cnt(x))[0]:null;
+    if(A){
+      const B=doms.find(d=>d!==A);
+      const ownA=own.filter(([it])=>it.dom===A).map(([,id])=>byId[id].n);
+      const ownB=own.filter(([it])=>it.dom!==A).map(([,id])=>byId[id].n);
+      steps.push(`<b>1 curso de pregrado del ${D(A)}, reconocido de tu malla:</b> ${ownA.join(', ')}.${ownA.length>1?' Basta con uno.':''}`);
+      const oB=preOpts(B);
+      steps.push(oB.length?`<b>1 curso de pregrado del ${D(B)}, de otra carrera:</b> ${listNames(oB)}.`:`<b>1 curso de magíster adicional del ${D(B)}.</b>`);
+      const pB=post.filter(i=>i.dom===B).map(i=>i.name);
+      steps.push(`<b>3 cursos de postgrado, priorizando el ${D(B)}:</b> ${listNames(pB.length?pB:post.map(i=>i.name))}.${capTxt}`);
+      if(ownB.length) notes.push(`${ownB.join(', ')} también ${ownB.length>1?'pertenecen':'pertenece'} al minor, en el ${D(B)}. Se recomienda cursar ese dominio con cursos de otra carrera y de magíster, para ampliar la formación más allá de la propia malla.`);
+    } else {
+      doms.forEach(d=>{ const o=preOpts(d); steps.push(o.length?`<b>1 curso de pregrado del ${D(d)}:</b> ${listNames(o)}.`:`<b>1 curso de magíster del ${D(d)}.</b>`); });
+      steps.push(`<b>3 cursos de postgrado, idealmente de ambos dominios:</b> ${listNames(post.map(i=>i.name))}.${capTxt}`);
+    }
+  } else {
+    const ownN=own.map(([,id])=>byId[id].n);
+    if(ownN.length) steps.push(`<b>Hasta 2 cursos de pregrado, reconocidos de tu malla:</b> ${ownN.join(', ')}.${ownN.length>2?' Basta con dos.':''}`);
+    if(ownN.length<2){ const o=[...other,...inCareer].filter(i=>!i.pend).map(i=>shortName(i.name)); steps.push(`<b>${2-ownN.length} curso${ownN.length?'':'s'} de pregrado de otra carrera:</b> ${listNames(o)}.`); }
+    steps.push(`<b>3 cursos de postgrado:</b> ${listNames(post.map(i=>i.name))}.${capTxt}`);
+  }
+  return `<div class="route"><h3>Ruta sugerida</h3><ol>${steps.map(x=>`<li>${x}</li>`).join('')}</ol>
+    ${notes.map(n=>`<p class="note" style="margin-top:6px">${n}</p>`).join('')}
+    <p class="note" style="margin-top:6px">Orientación según la guía de minors: 5 cursos y 30 SCT, en general 2 de pregrado y 3 de postgrado. ${MRULE[m.name]||''}</p></div>`;
+}
+function renderMinor(m,own,inCareer,other,post,cap,pend){
+  const CK=cur.toUpperCase();
+  const doms=[...new Set(m.items.map(i=>i.dom).filter(Boolean))];
+  const dchip=d=>d?`<span class="dchip">D${doms.indexOf(d)+1}</span>`:'';
+  const ownHTML=own.length?`<ul class="mlist">${own.map(([it,id])=>`<li class="ok">${dchip(it.dom)}<b>${byId[id].n}</b><small>${codeTxt(it)}${it.dom?', '+it.dom:''}</small></li>`).join('')}</ul>`
+    :'<p class="none">Ningún curso obligatorio de esta malla forma parte del minor.</p>';
+  const otherFn=it=>`<li>${dchip(it.dom)}<b>${NAMEFIX[it.name]||it.name}</b><small>${codeTxt(it)}. ${it.careers.length?it.careers.map(k=>(inMalla(k,it)?'Obligatorio en ':'Electivo de ')+k).join(', ')+'.':''}${(it.elec||[]).includes(CK)?' Disponible como electivo para '+CK+'.':''}${it.note&&!(it.elec||[]).length?' '+it.note+'.':''}${it.period?' '+it.period+'.':''}${it.pend?' En revisión para el minor.':''}</small></li>`;
+  const postFn=it=>`<li>${dchip(it.dom)}<b>${it.name}</b><small>${codeTxt(it)}${it.prog?'. '+it.prog.map(p=>PROG[p]||p).join(', '):''}${it.period?'. '+it.period:''}${it.note?'. '+it.note:''}</small></li>`;
+  showPanel(filterHead('Minor','Minor en '+m.name,'30 SCT en 5 cursos, en general 2 de pregrado y 3 de postgrado.')+`<div class="body">
+    ${doms.length?`<div class="doms">${doms.map((d,i)=>`<span><span class="dchip">D${i+1}</span>${d}</span>`).join('')}</div>`:''}
+    ${routeHTML(m,own,inCareer,other,post,cap,doms)}
+    <div class="keyline"><span><i class="k-hit"></i>Ya cubierto en esta malla</span><span><i class="k-pend"></i>En revisión</span><span><i class="k-slot"></i>Cupo electivo o de profundización donde inscribir cursos del minor</span></div>
+    <h3>Ya cubiertos en esta malla (${own.length})</h3>${ownHTML}
+    ${pend.length?`<h3>En revisión (${pend.length})</h3><ul class="mlist">${pend.map(([it,id])=>`<li class="pd"><b>${byId[id].n}</b><small>${codeTxt(it)}. ${it.pend[CK]}</small></li>`).join('')}</ul>`:''}
+    ${inCareer.length?`<h3>Electivos de pregrado de esta carrera (${inCareer.length})</h3>${domGroup(inCareer,otherFn)}`:''}
+    <h3>Sugeridos de otras mallas (${other.length})</h3>${other.length?domGroup(other,otherFn):'<p class="none">Sin cursos de otras mallas.</p>'}
+    <h3>Cursos de magíster (${post.length})</h3>${domGroup(post,postFn)}
+    ${cap.length?`<h3>Capstone</h3><ul class="mlist">${cap.map(postFn).join('')}</ul>`:''}
+    <p class="note">Los cursos del minor que no están en la malla se inscriben en los cupos destacados con borde punteado: electivos del ciclo profesional y, en ICLA e ICLE, electivos de profundización. La composición exacta del minor depende de su norma vigente.</p>
+  </div>`,true);
+}
+function renderCat(type,v,hits){
+  const title=type==='tag'?TAGS[v].t:GEN_SHORT[+v];
+  const meta=type==='tag'?'Característica del curso':'Competencia genérica '+(+v+1);
+  const body=(type==='comp'?`<p class="desc">${GEN[+v]}</p>`:'')+
+    `<h3>Cursos destacados en esta malla (${hits.length})</h3>`+
+    (hits.length?`<div class="chips">${hits.map(c=>chip(c.id)).join('')}</div>`:'<p class="none">Aún no hay cursos clasificados con este criterio. Se mostrarán cuando se cargue la información.</p>');
+  showPanel(filterHead(type==='tag'?'Característica':'Competencia genérica',title,meta)+`<div class="body">${body}</div>`);
+}
+
 function renderEmpty(){ panel.hidden=true; panel.innerHTML=''; }
 
+const filled=v=>v&&(!Array.isArray(v)||v.length);
+function fichaHTML(rows,secs,i){
+  const show=INTERNO?rows:rows.filter(([,v])=>filled(v));
+  const attrs=secs.length?` role="tabpanel" id="sp" aria-labelledby="st${i}"`:'';
+  if(!show.length) return `<p class="none"${attrs}>Ficha en preparación.</p>`;
+  return `<dl class="ficha"${attrs}>${show.map(([l,v])=>`<dt>${l}</dt><dd>${val(v)}</dd>`).join('')}</dl>`+
+    (!INTERNO&&show.length<rows.length?'<p class="none" style="margin-top:6px">Resto de la ficha en preparación.</p>':'');
+}
+/* 4. Notas de la malla que aplican al curso */
+function ctxNote(c){
+  const cfg=CAREERS[cur], n=[];
+  if(cfg.exam==='all8'&&c.s<=8) n.push('Requisito para rendir el examen final, que exige aprobar todos los cursos de los semestres 1 a 8.');
+  else if(Array.isArray(cfg.exam)&&cfg.exam.includes(c.id)) n.push('Requisito para rendir el examen final de título.');
+  const req=list.filter(x=>x.id==='tin'||x.id==='tpr').find(x=>(x.q||[]).includes(c.id));
+  if(req) n.push(`Requisito del ${req.n}, en la vía Práctica Profesional.`);
+  return n.length?`<ul class="ctx">${n.map(x=>`<li>${x}</li>`).join('')}</ul>`:'';
+}
 function reqHTML(c){
   const q=(c.q||[]).filter(p=>byId[p]);
   if(q.length) return `<div class="chips">${q.map(chip).join('')}</div>`+(c.cr?`<p class="cond" style="margin-top:8px">Además, mínimo ${c.cr} créditos SCT aprobados.</p>`:'');
@@ -719,10 +1088,10 @@ function renderPanel(c,anc,des){
   if(elec){
     body=`<h3>Requisito para inscribir</h3>${reqHTML(c)}
       <h3>Cómo se completa</h3><p class="none" style="color:var(--ink)">${elecHow(c)}</p>
-      <h3>Oferta disponible</h3><p class="none">${tbd}</p>
+      ${INTERNO?`<h3>Oferta disponible</h3><p class="none">${tbd}</p>`:''}
       ${k.length?`<h3><span class="dot" style="background:var(--post)"></span>Habilita directamente</h3><div class="chips">${k.map(chip).join('')}</div>`:''}
       ${rtNote}`;
-    acts=`<button type="button" class="btn primary" aria-disabled="true" title="Oferta aún no disponible">Ver oferta de electivos</button>`;
+    acts=INTERNO?`<button type="button" class="btn primary" aria-disabled="true" title="Oferta aún no disponible">Ver oferta de electivos</button>`:'';
   } else {
     const d=c.d||{};
     if(panelFor!==c.id){secIdx=0; panelFor=c.id;}
@@ -733,36 +1102,26 @@ function renderPanel(c,anc,des){
       <div class="sectabs" role="tablist" aria-label="Secciones del curso">
         ${secs.map((x,i)=>`<button type="button" class="sectab" role="tab" id="st${i}" aria-controls="sp" aria-selected="${i===secIdx}" tabindex="${i===secIdx?0:-1}" data-sec="${i}">${secLabel(x.n)}${(x.tags||[]).map(t=>tagHTML(t)).join('')}</button>`).join('')}
       </div>`:'';
+    const rows=[['Código',d.code],['Idioma',pick('lang')],['Metodología',pick('met')],...(secs.length?[['Docente',sec.prof]]:[]),
+      ['Competencias genéricas',d.compG],['Competencias específicas',d.compE],['ODS',d.ods],['Minor',d.minor],...(cur==='icla'?[['Especialización',d.esp]]:[])];
     body=`<h3><span class="dot" style="background:var(--pre)"></span>Requisitos directos</h3>${reqHTML(c)}
       <h3><span class="dot" style="background:var(--post)"></span>Habilita directamente</h3>
       ${k.length?`<div class="chips">${k.map(chip).join('')}</div>`:'<p class="none">No es requisito de otro curso de la malla.</p>'}
+      ${ctxNote(c)}
       <p class="none" style="color:var(--ink);margin-top:10px">Cadena completa: ${nA} ${nA===1?'curso previo':'cursos previos'} y ${nD} ${nD===1?'curso que depende':'cursos que dependen'} de este.</p>
-      <h3>Descripción</h3><p class="desc">${val(d.desc)}</p>
-      <h3>Información del curso</h3>${tabs}
-      <dl class="ficha"${secs.length?` role="tabpanel" id="sp" aria-labelledby="st${secIdx}"`:''}>
-        <dt>Código</dt><dd>${val(d.code)}</dd>
-        <dt>Idioma</dt><dd>${val(pick('lang'))}</dd>
-        <dt>Metodología</dt><dd>${val(pick('met'))}</dd>
-        ${secs.length?`<dt>Docente</dt><dd>${val(sec.prof)}</dd>`:''}
-        <dt>Competencias genéricas</dt><dd>${val(d.compG)}</dd>
-        <dt>Competencias específicas</dt><dd>${val(d.compE)}</dd>
-        <dt>ODS</dt><dd>${val(d.ods)}</dd>
-        <dt>Minor</dt><dd>${val(d.minor)}</dd>
-        ${cur==='icla'?`<dt>Especialización</dt><dd>${val(d.esp)}</dd>`:''}
-      </dl>
+      ${(d.desc||INTERNO)?`<h3>Descripción</h3><p class="desc">${val(d.desc)}</p>`:''}
+      <h3>Información del curso</h3>${tabs}${fichaHTML(rows,secs,secIdx)}
       ${c.note?`<p class="note">${c.note}</p>`:''}${rtNote}`;
     const secSyl=secs.filter(x=>x.syllabus);
     acts=(d.syllabus?`<a class="btn primary" href="${d.syllabus}" target="_blank" rel="noopener">Syllabus</a>`:`<button type="button" class="btn primary" aria-disabled="true" title="Syllabus aún no disponible">Syllabus</button>`)+
       secSyl.map(x=>`<a class="btn" href="${x.syllabus}" target="_blank" rel="noopener">Syllabus ${secLabel(x.n).toLowerCase()}</a>`).join('');
   }
-  panel.innerHTML=head+`<div class="body">${body}</div><div class="acts">${acts}</div>`;
+  panel.innerHTML=RSZ+head+`<div class="body">${body}</div>`+(acts?`<div class="acts">${acts}</div>`:'');
   panel.setAttribute('aria-labelledby','ph');
   panel.classList.toggle('min',minimized);
-  /* El panel se ubica en el costado con menos cursos de la cadena */
-  const cols=[c.s,...Object.keys(anc).map(x=>byId[x].s),...Object.keys(des).map(x=>byId[x].s)];
-  const leftN=cols.filter(x=>x<=3).length, rightN=cols.filter(x=>x>=8).length;
-  panel.classList.toggle('left',leftN<rightN);
+  panel.classList.remove('left');
   panel.hidden=false;
+  setTimeout(revealSel,260);
 }
 
 function renderSel(){
@@ -783,16 +1142,28 @@ panel.addEventListener('click',e=>{
   if(go){
     const id=go.dataset.go; select(id);
     const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
-    boxEl[id].scrollIntoView({behavior:reduce?'auto':'smooth',block:'nearest',inline:'center'});
-    boxEl[id].focus({preventScroll:true});
+    const tgt=document.body.classList.contains('listview')?liEl[id]:boxEl[id];
+    if(!document.body.classList.contains('listview')) tgt.scrollIntoView({behavior:reduce?'auto':'smooth',block:'nearest',inline:'center'});
+    tgt.focus({preventScroll:true});
   }
   if(e.target.closest('[data-clear]')) select(null);
-  if(e.target.closest('[data-min]')){ minimized=!minimized; select(sel); }
+  if(e.target.closest('[data-fclear]')){ filt=''; filtEl.value=''; applyFilter(); }
+  if(e.target.closest('[data-min]')){ minimized=!minimized; if(filt&&!sel) applyFilter(); else select(sel); }
   const st=e.target.closest('[data-sec]');
   if(st){ secIdx=+st.dataset.sec; renderSel(); panel.querySelector(`[data-sec="${secIdx}"]`).focus(); }
 });
-stage.addEventListener('click',()=>select(null));
-document.addEventListener('keydown',e=>{if(e.key==='Escape') select(null);});
+stage.addEventListener('click',()=>{ if(sel) select(null); });
+fillFilters();
+setView();
+/* El panel no tapa cabecera, pestañas ni filtros: parte a la altura de la malla */
+function placePanel(){
+  if(innerWidth<=760){panel.style.top='';panel.style.maxHeight='';return;}
+  const t=Math.max(16,scroller.getBoundingClientRect().top);
+  panel.style.top=t+'px'; panel.style.maxHeight=`calc(100vh - ${t+16}px)`;
+}
+addEventListener('scroll',placePanel,{passive:true}); addEventListener('resize',placePanel);
+new MutationObserver(placePanel).observe(panel,{attributes:true,attributeFilter:['hidden']});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){ if(sel) select(null); else if(filt){filt=''; filtEl.value=''; applyFilter();} }});
 build();
 })();
 </script>
